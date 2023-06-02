@@ -35,13 +35,45 @@ This is an ESP8266-based Arduino project that creates a web server with an API f
 
 - **POST /api** - This endpoint accepts JSON data to control the pins.
 
-  Example JSON request:
-  ```
-  {
-    "action": "read",
-    "pin": "D1"
-  }
-  ```
+  
+1. Action: "read"
+   - JSON:
+     ```json
+     {
+       "action": "read",
+       "pin": "D2"
+     }
+     ```
+
+2. Action: "write"
+   - JSON:
+     ```json
+     {
+       "action": "write",
+       "pin": "D4",
+       "value": 1
+     }
+     ```
+
+3. Action: "pwm"
+   - JSON:
+     ```json
+     {
+       "action": "pwm",
+       "pin": "D6",
+       "value": 512
+     }
+     ```
+
+4. Action: "enable_high_frequency"
+   - JSON:
+     ```json
+     {
+       "action": "enable_high_frequency",
+       "pin": "D1",
+       "frequency": 1000000
+     }
+     ```
 
   The `action` field can have the following values:
   - `"read"`: Reads the value of the specified pin.
