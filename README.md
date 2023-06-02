@@ -1,115 +1,64 @@
-this example for controlling pins using an ESP8266 web server with JSON API endpoints. It includes the necessary libraries and functions to handle different actions such as reading, writing, PWM control, and enabling high-frequency PWM.
+# ESP8266 Web Server with API for Pin Control
 
-Here's a breakdown of the code:
+This is an ESP8266-based Arduino project that creates a web server with an API for controlling digital and analog pins. It allows you to perform actions such as reading pin values, writing digital values, generating PWM signals, and enabling high-frequency PWM.
 
-```cpp
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
-#include <ArduinoJson.h>
-#include <WiFiManager.h>
+## Hardware Requirements
+- ESP8266-based board (e.g., NodeMCU)
+- LEDs, resistors, and/or other components for testing (optional)
 
-ESP8266WebServer server(80);
-int pwmFrequency = 20000; // Default PWM frequency is set to 20 kHz
-```
-- The code includes the required libraries and initializes an ESP8266 web server on port 80. It also declares the `pwmFrequency` variable with a default value of 20,000.
+## Software Requirements
+- Arduino IDE
+- ESP8266WiFi library
+- ESP8266WebServer library
+- ArduinoJson library
+- WiFiManager library
 
-```cpp
-void handleAPI() {
-  // Check if there is a request with a "plain" argument
-  if (server.hasArg("plain")) {
-    String body = server.arg("plain");
+## Installation
 
-    // Parse JSON request
-    DynamicJsonDocument doc(256);
-    DeserializationError error = deserializeJson(doc, body);
+1. Open the Arduino IDE.
+2. Install the required libraries by navigating to **Sketch -> Include Library -> Manage Libraries**. Search for each library and click **Install**.
+3. Copy the provided code into a new Arduino sketch.
 
-    // Rest of the code...
-```
-- The `handleAPI()` function is the request handler for the `/api` endpoint. It extracts the JSON payload from the request and stores it in the `body` variable.
+## Usage
 
-```cpp
-    // Extract action, pin, value, and frequency from JSON
-    String action = doc["action"];
-    String pinName = doc["pin"];
-    int value = doc["value"];
-    int frequency = doc["frequency"];
-```
-- The JSON payload is parsed, and the values of "action," "pin," "value," and "frequency" are extracted.
+1. Connect your ESP8266-based board to your computer using a USB cable.
+2. Select the appropriate board and port from the **Tools** menu in the Arduino IDE.
+3. Compile and upload the sketch to your board.
+4. Open the Serial Monitor in the Arduino IDE to monitor the board's IP address.
+5. Connect your computer or mobile device to the same Wi-Fi network as the board.
+6. Open a web browser and enter the board's IP address in the address bar.
+7. You should see a web page with the WiFiManager configuration portal. Connect to the network named "NodeMCU" and enter your Wi-Fi credentials.
+8. Once connected, the board's IP address will be displayed in the Serial Monitor.
+9. Use the provided API to control the pins:
 
-```cpp
-    // Map pin name to pin number
-    int pin = -1;
-    if (pinName == "D0") {
-      pin = D0;
-    } else if (pinName == "D1") {
-      pin = D1;
-    } else if (pinName == "D2") {
-      pin = D2;
-    } else if (pinName == "D3") {
-      pin = D3;
-    } else if (pinName == "D4") {
-      pin = D4;
-    } else if (pinName == "D5") {
-      pin = D5;
-    } else if (pinName == "D6") {
-      pin = D6;
-    } else if (pinName == "D7") {
-      pin = D7;
-    } else if (pinName == "D8") {
-      pin = D8;
-    } else if (pinName == "A0") {
-      pin = A0;
-    } else {
-      server.send(400, "text/plain", "Invalid pin");
-      return;
-    }
-```
-- The pin name extracted from the JSON is mapped to the corresponding pin number.
+### API Endpoints
 
-```cpp
-    // Perform pin control action
-    if (action == "read") {
-      // Read pin value and send response
-    } else if (action == "write") {
-      // Write pin value and send response
-    } else if (action == "pwm") {
-      // Generate PWM signal and send response
-    } else if (action == "enable_high_frequency") {
-      // Enable high-frequency PWM and send response
-    }
-  } else {
-    server.send(400, "text/plain", "No data received");
+- **POST /api** - This endpoint accepts JSON data to control the pins.
+
+  Example JSON request:
+  ```
+  {
+    "action": "read",
+    "pin": "D1"
   }
-}
-```
-- The code checks the action received in the JSON and performs the corresponding pin control action.
+  ```
 
-```cpp
-void setup() {
-  WiFiManager wifiManager;
+  The `action` field can have the following values:
+  - `"read"`: Reads the value of the specified pin.
+  - `"write"`: Writes a digital value (0 or 1) to the specified pin.
+  - `"pwm"`: Generates a PWM signal on the specified pin with the provided analog value.
+  - `"enable_high_frequency"`: Enables high-frequency PWM on the specified pin with the provided frequency.
 
-  wifiManager.autoConnect("NodeMCU");
+  The `pin` field can have the following values:
+  - `"D0"`, `"D1"`, `"D2"`, `"D3"`, `"D4"`, `"D5"`, `"D6"`, `"D7"`, `"D8"`: Digital pins.
+  - `"A0"`: Analog pin.
 
-  Serial.begin(115200);
-  Serial
+  The `value` field is required for `"write"` and `"pwm"` actions. It should be a digital value (0 or 1) for `"write"` action or an analog value (0-1023) for `"pwm"` action.
 
-.println("WiFi connected!");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  The `frequency` field is required for `"enable_high_frequency"` action and should be a frequency value in Hz (1-1000000).
 
-  server.on("/api", HTTP_POST, handleAPI); // API endpoint for pin control
+  The server will respond with the result of the action or an error message.
 
-  server.begin();
-  Serial.println("HTTP server started");
-}
+## Conclusion
 
-void loop() {
-  server.handleClient();
-}
-```
-- The `setup()` function initializes the WiFi connection and starts the web server. It also sets up the `/api` endpoint to handle POST requests for pin control.
-- The `loop()` function handles client requests.
-
-Overall, this code provides a basic framework for controlling pins using a web server with JSON API endpoints. You can send requests to the server with the appropriate JSON payload to perform pin control actions.
-
-\
+This project demonstrates how to create a web server with an API for controlling pins on an ESP8266-based board. By using the provided API endpoints, you can read pin values, write digital values, generate PWM signals, and enable high-frequency PWM. Feel free to modify the code and add more functionality to suit your needs.
